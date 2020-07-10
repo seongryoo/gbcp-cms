@@ -12,3 +12,9 @@ include( plugin_dir_path( __FILE__ ) . 'includes/gbcp-block-render.php' );
 
 // Custom posts file connects php files which register individual custom post types
 include( plugin_dir_path( __FILE__ ) . 'includes/gbcp-custom-posts.php' );
+
+
+// Very useful helper method
+function scream( $msg ) {
+  echo '<script>console.log("' . $msg . '");</script>';
+}
