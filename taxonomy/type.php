@@ -24,6 +24,7 @@ function gbcp_register_opp_taxon_type() {
     'hierarchical'            => false,
     'labels'                  => $activities_labels,
     'rewrite'                 => $activities_slugs,
+    'show_in_rest'            => true,
   );
 
   register_taxonomy( 'type', 'post_opp', $activities_args );

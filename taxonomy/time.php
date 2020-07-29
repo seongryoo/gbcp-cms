@@ -24,6 +24,7 @@ function gbcp_register_opp_taxon_time() {
     'hierarchical'            => false,
     'labels'                  => $commit_labels,
     'rewrite'                 => $commit_slugs,
+    'show_in_rest'            => true,
   );
 
   register_taxonomy( 'time', 'post_opp', $commit_args );

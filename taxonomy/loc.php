@@ -24,6 +24,7 @@ function gbcp_register_opp_taxon_loc() {
     'hierarchical'            => false,
     'labels'                  => $loc_labels,
     'rewrite'                 => $loc_slugs,
+    'show_in_rest'            => true,
   );
 
   register_taxonomy( 'loc', 'post_opp', $loc_args );
