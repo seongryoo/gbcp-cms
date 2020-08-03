@@ -9,6 +9,9 @@ define( 'PLUGIN_FILE_URL', __FILE__ );
 // Assets file loads in js and css needed to render blocks in WP editor
 include( plugin_dir_path( __FILE__ ) . 'includes/gbcp-assets.php' );
 
+// Categories file registers block category to be used for gbcp posts
+include( plugin_dir_path( __FILE__ ) . 'includes/gbcp-block-categories.php' );
+
 // Blocks file loads in php files needed for any custom block-based rendering
 include( plugin_dir_path( __FILE__ ) . 'includes/gbcp-block-render.php' );
 
