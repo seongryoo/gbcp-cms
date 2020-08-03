@@ -27,7 +27,7 @@ function gbcp_register_opp_taxon_time() {
     'show_in_rest'            => true,
   );
 
-  register_taxonomy( 'time', 'post_opp', $commit_args );
+  register_taxonomy( 'taxon_time', 'post_opp', $commit_args );
 }
 add_action( 'init', 'gbcp_register_opp_taxon_time' );
 
@@ -35,7 +35,7 @@ function gbcp_register_opp_taxon_time_defaults() {
   gbcp_register_opp_taxon_time();
 
   // Only adds defaults if there are no terms
-  if ( ! has_term( '', 'time' ) ) {
+  if ( ! has_term( '', 'taxon_time' ) ) {
     $defaults = array(
       'A few minutes'         => array(
         'slug'                    => 'time-min',
@@ -52,8 +52,8 @@ function gbcp_register_opp_taxon_time_defaults() {
     );
 
     foreach( $defaults as $term => $args ) {
-      if ( term_exists( $term ) == null ) {
-        wp_insert_term( $term, 'time', $args );
+      if ( term_exists( $term, 'taxon_time' ) == null ) {
+        wp_insert_term( $term, 'taxon_time', $args );
       }
     }
   }

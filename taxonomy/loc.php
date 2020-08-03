@@ -27,7 +27,7 @@ function gbcp_register_opp_taxon_loc() {
     'show_in_rest'            => true,
   );
 
-  register_taxonomy( 'loc', 'post_opp', $loc_args );
+  register_taxonomy( 'taxon_loc', 'post_opp', $loc_args );
 }
 add_action( 'init', 'gbcp_register_opp_taxon_loc' );
 
@@ -35,7 +35,7 @@ function gbcp_register_opp_taxon_loc_defaults() {
   gbcp_register_opp_taxon_loc();
 
   // Only adds defaults if there are no terms
-  if ( ! has_term( '', 'loc' ) ) {
+  if ( ! has_term( '', 'taxon_loc' ) ) {
     $defaults = array(
       'On campus'               => array(
         'description'             => 'On campus at Georgia Tech',
@@ -52,8 +52,8 @@ function gbcp_register_opp_taxon_loc_defaults() {
     );
 
     foreach( $defaults as $term => $args ) {
-      if ( term_exists( $term ) == null ) {
-        wp_insert_term( $term, 'loc', $args );
+      if ( term_exists( $term, 'taxon_loc' ) == null ) {
+        wp_insert_term( $term, 'taxon_loc', $args );
       }
     }
   }

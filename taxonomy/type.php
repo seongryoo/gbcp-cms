@@ -23,11 +23,11 @@ function gbcp_register_opp_taxon_type() {
   $activities_args = array(
     'hierarchical'            => false,
     'labels'                  => $activities_labels,
-    'rewrite'                 => $activities_slugs,
     'show_in_rest'            => true,
+    'rewrite'                 => $activities_slugs,
   );
 
-  register_taxonomy( 'type', 'post_opp', $activities_args );
+  register_taxonomy( 'taxon_type', 'post_opp', $activities_args );
 }
 add_action( 'init', 'gbcp_register_opp_taxon_type' );
 
@@ -35,7 +35,7 @@ function gbcp_register_opp_taxon_type_defaults() {
   gbcp_register_opp_taxon_type();
 
   // Only adds defaults if there are no terms
-  if ( ! has_term( '', 'type' ) ) {
+  if ( ! has_term( '', 'taxon_type' ) ) {
     $defaults = array(
       'Academics'             => array(
         'description'           => 'Opportunities relating to academic study, curricula, etc.',
@@ -64,8 +64,8 @@ function gbcp_register_opp_taxon_type_defaults() {
     );
 
     foreach( $defaults as $term => $args ) {
-      if ( term_exists( $term ) == null ) {
-        wp_insert_term( $term, 'type', $args );
+      if ( term_exists( $term, 'taxon_type' ) == null ) {
+        wp_insert_term( $term, 'taxon_type', $args );
       }
     }
   }
