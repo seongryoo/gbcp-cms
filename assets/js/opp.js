@@ -35,6 +35,9 @@
         .getEditedPostAttribute('taxon_loc');
     const idData = select('core/editor')
         .getCurrentPostId();
+    const getTypeData = function() {
+      return select('core/editor').getEditedPostAttribute('taxon_type');
+    };
     return {
       times: timeTerms,
       types: typeTerms,
@@ -48,7 +51,10 @@
   const editTerms = withDispatch(function(dispatch, props) {
     return {
       setTerm: function(term, idArray) {
-        dispatch('core/editor').editPost(
+        dispatch('core').editEntityRecord(
+          'postType',
+          'post_opp',
+          props.postId,
           {
             [term]: idArray,
           }
@@ -68,26 +74,17 @@
     console.log(props.locs);
     const generateTags = function(allTags, elementArray, slug) {
       const chosenTags = props[slug];
-      const isChecked = function(id) {
-        for (const tagId of chosenTags) {
+      const isCheckedIn = function(id, array) {
+        for (const tagId of array) {
           if (id == tagId) {
-            console.log('yup')
+            console.log('uip');
             return true;
           }
         }
-        console.log('nope')
         return false;
-      };
-      const addTerm = function(id) {
-        chosenTags.push(id);
-      };
-      const removeTerm = function(id) {
-        for (const [index, tagId] of chosenTags.entries()) {
-          if (id == tagId) {
-            chosenTags.splice(index, 1);
-            break;
-          }
-        }
+      }
+      const isChecked = function(id) {
+        return isCheckedIn(chosenTags);
       };
       for (const tag of allTags) {
         const id = tag.id;
@@ -97,16 +94,21 @@
             {
               'className': 'appia-tag',
               'data-id': id,
-              'checked': isChecked(id),
+              'checked': isCheckedIn(id, props[slug]),
               'label': name,
-              'onChange': function(isChosen) {
-                if (isChosen) {
-                  addTerm(id);
+              'onChange': function() {
+                let fetchSlugs = props[slug].slice(0);
+                let theArray = [];
+                if (fetchSlugs.indexOf(id) == -1) {
+                  fetchSlugs.push(id)
                 } else {
-                  removeTerm(id);
+                  const removeIndex = fetchSlugs.indexOf(id);
+                  console.log('Index of ' + id + ' is at ' + removeIndex)
+                  fetchSlugs.splice(removeIndex, 1);
+                  console.log(fetchSlugs)
                 }
-                console.log(chosenTags)
-                props.setTerm(slug, chosenTags);
+                console.log(fetchSlugs)
+                props.setTerm(slug, fetchSlugs);
               },
             }
         );

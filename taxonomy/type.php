@@ -16,8 +16,6 @@ function gbcp_register_opp_taxon_type() {
 
   $activities_slugs = array(
     'slug'                    => 'type',
-    'with_front'              => false,
-    'hierarchical'            => false,
   );
 
   $activities_args = array(
@@ -25,6 +23,8 @@ function gbcp_register_opp_taxon_type() {
     'labels'                  => $activities_labels,
     'show_in_rest'            => true,
     'rewrite'                 => $activities_slugs,
+    'rest_base'               => 'taxon_type',
+    'rest_controller_class'   => 'WP_REST_Terms_Controller',
   );
 
   register_taxonomy( 'taxon_type', 'post_opp', $activities_args );
