@@ -28,43 +28,68 @@
         queryArgs
     );
     const typeData = select('core/editor')
-        .getCurrentPostAttribute('taxon_type');
+        .getEditedPostAttribute('taxon_type');
     const timeData = select('core/editor')
-        .getCurrentPostAttribute('taxon_time');
+        .getEditedPostAttribute('taxon_time');
     const locData = select('core/editor')
-        .getCurrentPostAttribute('taxon_loc');
+        .getEditedPostAttribute('taxon_loc');
     const idData = select('core/editor')
         .getCurrentPostId();
     return {
       times: timeTerms,
       types: typeTerms,
       locs: locTerms,
-      chosenTypes: typeData,
-      chosenTimes: timeData,
-      chosenLocs: locData,
+      taxon_type: typeData,
+      taxon_time: timeData,
+      taxon_loc: locData,
       postId: idData,
     };
   });
-  const oppEdit = compose(fetchTerms)(function(props) {
+  const editTerms = withDispatch(function(dispatch, props) {
+    return {
+      setTerm: function(term, idArray) {
+        dispatch('core/editor').editPost(
+          {
+            [term]: idArray,
+          }
+        );
+      },
+    };
+  });
+  const oppEdit = compose(fetchTerms, editTerms)(function(props) {
     if (!props.times || !props.types || !props.locs) {
       return 'Fetching tags...';
     }
-    if (!props.chosenTimes || !props.chosenTypes || !props.chosenLocs) {
+    if (!props.taxon_time || !props.taxon_type || !props.taxon_loc) {
       return 'Fetching post data...';
     }
     console.log(props.times);
     console.log(props.types);
     console.log(props.locs);
-    const generateTags = function(data, arr, chosenTags) {
+    const generateTags = function(allTags, elementArray, slug) {
+      const chosenTags = props[slug];
       const isChecked = function(id) {
         for (const tagId of chosenTags) {
           if (id == tagId) {
+            console.log('yup')
             return true;
           }
         }
+        console.log('nope')
         return false;
       };
-      for (const tag of data) {
+      const addTerm = function(id) {
+        chosenTags.push(id);
+      };
+      const removeTerm = function(id) {
+        for (const [index, tagId] of chosenTags.entries()) {
+          if (id == tagId) {
+            chosenTags.splice(index, 1);
+            break;
+          }
+        }
+      };
+      for (const tag of allTags) {
         const id = tag.id;
         const name = tag.name;
         const checkbox = el(
@@ -74,24 +99,30 @@
               'data-id': id,
               'checked': isChecked(id),
               'label': name,
-              'onChange': function(value) {
-                console.log(value)
+              'onChange': function(isChosen) {
+                if (isChosen) {
+                  addTerm(id);
+                } else {
+                  removeTerm(id);
+                }
+                console.log(chosenTags)
+                props.setTerm(slug, chosenTags);
               },
             }
         );
-        arr.push(checkbox);
+        elementArray.push(checkbox);
       }
     }
-    const timeTags = [];
-    generateTags(props.times, timeTags, props.chosenTimes);
-    const typeTags = [];
-    generateTags(props.types, typeTags, props.chosenTypes);
-    const locTags = [];
-    generateTags(props.locs, locTags, props.chosenLocs);
+    const elTimeTags = [];
+    generateTags(props.times, elTimeTags, 'taxon_time');
+    const elTypeTags = [];
+    generateTags(props.types, elTypeTags, 'taxon_type');
+    const elLocTags = [];
+    generateTags(props.locs, elLocTags, 'taxon_loc');
     return el(
         'div',
         {},
-        [timeTags, typeTags, locTags]
+        [elTimeTags, elTypeTags, elLocTags]
     );
   });
   const oppArgs = {
