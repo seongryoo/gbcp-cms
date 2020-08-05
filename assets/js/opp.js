@@ -5,6 +5,7 @@
   // database api
   const withSelect = wp.data.withSelect;
   const withDispatch = wp.data.withDispatch;
+  const compose = wp.compose.compose;
   // Components
   const CheckboxControl = wp.components.CheckboxControl;
   const fetchTerms = withSelect(function(select) {
@@ -26,9 +27,14 @@
         'taxon_type',
         queryArgs
     );
-    const typeData = select('core/editor').getCurrentPostAttribute('taxon_type');
-    const timeData = select('core/editor').getCurrentPostAttribute('taxon_time');
-    const locData  = select('core/editor').getCurrentPostAttribute('taxon_loc');
+    const typeData = select('core/editor')
+        .getCurrentPostAttribute('taxon_type');
+    const timeData = select('core/editor')
+        .getCurrentPostAttribute('taxon_time');
+    const locData = select('core/editor')
+        .getCurrentPostAttribute('taxon_loc');
+    const idData = select('core/editor')
+        .getCurrentPostId();
     return {
       times: timeTerms,
       types: typeTerms,
@@ -36,9 +42,10 @@
       chosenTypes: typeData,
       chosenTimes: timeData,
       chosenLocs: locData,
+      postId: idData,
     };
   });
-  const oppEdit = fetchTerms(function(props) {
+  const oppEdit = compose(fetchTerms)(function(props) {
     if (!props.times || !props.types || !props.locs) {
       return 'Fetching tags...';
     }
@@ -56,7 +63,7 @@
           }
         }
         return false;
-      }
+      };
       for (const tag of data) {
         const id = tag.id;
         const name = tag.name;
@@ -69,7 +76,7 @@
               'label': name,
               'onChange': function(value) {
                 console.log(value)
-              }
+              },
             }
         );
         arr.push(checkbox);
