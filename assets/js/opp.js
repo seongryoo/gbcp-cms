@@ -8,7 +8,6 @@
   const compose = wp.compose.compose;
   // core api helper methods
   const getAttr = wp.data.select('core/editor').getEditedPostAttribute;
-  const getEntity = wp.data.select('core').getEntityRecords;
   // Components
   const CheckboxControl = wp.components.CheckboxControl;
   // Get taxonomy data
@@ -16,22 +15,28 @@
   wp.apiFetch({path: '/wp/v2/taxonomies'}).then((taxonomies) => {
     taxons = taxonomies;
   });
+  let allLocs;
+  wp.apiFetch({path: '/wp/v2/taxon_loc'}).then((terms) => {
+    allLocs = terms;
+  });
+  let allTimes;
+  wp.apiFetch({path: '/wp/v2/taxon_time'}).then((terms) => {
+    allTimes = terms;
+  });
+  let allTypes;
+  wp.apiFetch({path: '/wp/v2/taxon_type'}).then((terms) => {
+    allTypes = terms;
+  });
   const fetchTerms = withSelect(function(select) {
-    const queryArgs = {
-      per_page: -1,
-    };
-    const locTerms = getEntity('taxonomy', 'taxon_loc', queryArgs);
-    const timeTerms = getEntity('taxonomy', 'taxon_time', queryArgs);
-    const typeTerms = getEntity('taxonomy', 'taxon_type', queryArgs);
     const typeData = getAttr('taxon_type');
     const timeData = getAttr('taxon_time');
     const locData = getAttr('taxon_loc');
     const idData = select('core/editor').getCurrentPostId();
 
     return {
-      allTimes: timeTerms,
-      allTypes: typeTerms,
-      allLocs: locTerms,
+      allTimes: allTimes,
+      allTypes: allTypes,
+      allLocs: allLocs,
       taxon_type: typeData,
       taxon_time: timeData,
       taxon_loc: locData,
