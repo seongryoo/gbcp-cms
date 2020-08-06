@@ -6,35 +6,28 @@
   const withSelect = wp.data.withSelect;
   const withDispatch = wp.data.withDispatch;
   const compose = wp.compose.compose;
+  // core api helper methods
+  const getAttr = wp.data.select('core/editor').getEditedPostAttribute;
+  const getEntity = wp.data.select('core').getEntityRecords;
   // Components
   const CheckboxControl = wp.components.CheckboxControl;
+  // Get taxonomy data
+  let taxons;
+  wp.apiFetch({path: '/wp/v2/taxonomies'}).then((taxonomies) => {
+    taxons = taxonomies;
+  });
   const fetchTerms = withSelect(function(select) {
     const queryArgs = {
       per_page: -1,
     };
-    const locTerms = select('core').getEntityRecords(
-        'taxonomy',
-        'taxon_loc',
-        queryArgs
-    );
-    const timeTerms = select('core').getEntityRecords(
-        'taxonomy',
-        'taxon_time',
-        queryArgs
-    );
-    const typeTerms = select('core').getEntityRecords(
-        'taxonomy',
-        'taxon_type',
-        queryArgs
-    );
-    const typeData = select('core/editor')
-        .getEditedPostAttribute('taxon_type');
-    const timeData = select('core/editor')
-        .getEditedPostAttribute('taxon_time');
-    const locData = select('core/editor')
-        .getEditedPostAttribute('taxon_loc');
-    const idData = select('core/editor')
-        .getCurrentPostId();
+    const locTerms = getEntity('taxonomy', 'taxon_loc', queryArgs);
+    const timeTerms = getEntity('taxonomy', 'taxon_time', queryArgs);
+    const typeTerms = getEntity('taxonomy', 'taxon_type', queryArgs);
+    const typeData = getAttr('taxon_type');
+    const timeData = getAttr('taxon_time');
+    const locData = getAttr('taxon_loc');
+    const idData = select('core/editor').getCurrentPostId();
+
     return {
       allTimes: timeTerms,
       allTypes: typeTerms,
@@ -48,25 +41,28 @@
   const editTerms = withDispatch(function(dispatch, props) {
     return {
       setTerm: function(term, idArray) {
+        const edits = {
+          [term]: idArray,
+        };
         dispatch('core').editEntityRecord(
             'postType',
             'post_opp',
             props.postId,
-            {
-              [term]: idArray,
-            }
+            edits
         );
       },
     };
   });
   const oppEdit = compose(fetchTerms, editTerms)(function(props) {
-    if (!props.allTimes || !props.allTypes || !props.allLocs) {
+    if (!taxons || !props.allTimes || !props.allTypes || !props.allLocs) {
       return 'Fetching tags...';
     }
     if (!props.taxon_time || !props.taxon_type || !props.taxon_loc) {
       return 'Fetching post data...';
     }
-    const generateCheckboxes = function(allTags, elementArray, slug) {
+    const generateTagGroup = function(allTags, slug) {
+      const taxonomyName = taxons[slug].name;
+      const elementArray = [];
       for (const tag of allTags) {
         const id = tag.id;
         const name = tag.name;
@@ -91,17 +87,35 @@
         );
         elementArray.push(checkbox);
       } // End for iteration of allTags
+      const group = el(
+          'div',
+          {
+            id: 'field-tags-' + slug,
+          },
+          elementArray
+      );
+      const label = el(
+          'label',
+          {
+            for: 'field-tags-' + slug,
+          },
+          taxonomyName
+      );
+      return el(
+          'div',
+          {
+
+          },
+          [label, group]
+      );
     }; // End generateCheckboxes()
-    const timeCheckboxArray = [];
-    generateCheckboxes(props.allTimes, timeCheckboxArray, 'taxon_time');
-    const typeCheckboxArray = [];
-    generateCheckboxes(props.allTypes, typeCheckboxArray, 'taxon_type');
-    const locCheckboxArray = [];
-    generateCheckboxes(props.allLocs, locCheckboxArray, 'taxon_loc');
+    const timeTags = generateTagGroup(props.allTimes, 'taxon_time');
+    const typeTags = generateTagGroup(props.allTypes, 'taxon_type');
+    const locTags = generateTagGroup(props.allLocs, 'taxon_loc');
     return el(
         'div',
         {},
-        [timeCheckboxArray, typeCheckboxArray, locCheckboxArray]
+        [timeTags, typeTags, locTags]
     );
   });
   const oppArgs = {
