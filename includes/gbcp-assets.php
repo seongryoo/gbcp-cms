@@ -21,10 +21,16 @@ function gbcp_enqueue_block_scripts() {
   $scripts = array(
     'opp',
   );
+  $deps = array(
+    'wp-blocks',
+    'wp-i18n',
+    'wp-editor',
+    'wp-date',
+  );
   foreach( $scripts as $script ) {
     $script_name = 'gbcp-' . $script;
     $script_path = plugins_url( '/../assets/js/' . $script . '.js', __FILE__ );
-    wp_enqueue_script( $script_name, $script_path );
+    wp_enqueue_script( $script_name, $script_path, $deps );
   }
 }
 add_action( 'enqueue_block_editor_assets', 'gbcp_enqueue_block_scripts' );

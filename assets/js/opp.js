@@ -10,6 +10,8 @@
   const getAttr = wp.data.select('core/editor').getEditedPostAttribute;
   // Components
   const CheckboxControl = wp.components.CheckboxControl;
+  const TextControl = wp.components.TextControl;
+  const RichText = wp.blockEditor.RichText;
   // Get taxonomy data
   let taxons;
   wp.apiFetch({path: '/wp/v2/taxonomies'}).then((taxonomies) => {
@@ -32,7 +34,6 @@
     const timeData = getAttr('taxon_time');
     const locData = getAttr('taxon_loc');
     const idData = select('core/editor').getCurrentPostId();
-
     return {
       allTimes: allTimes,
       allTypes: allTypes,
@@ -65,6 +66,95 @@
     if (!props.taxon_time || !props.taxon_type || !props.taxon_loc) {
       return 'Fetching post data...';
     }
+    // Helper method that generates appia field wrapper
+    const elWrap = function(element, args, value) {
+      let generatedElement;
+      if (arguments.length == 3) {
+        generatedElement = el(element, args, value);
+      } else if (arguments.length == 2) {
+        generatedElement = el(element, args);
+      } else if (arguments.length == 1) {
+        generatedElement = el(element);
+      }
+      return el(
+          'div',
+          {
+            className: 'gbcp-field-block',
+          },
+          generatedElement
+      );
+    };
+    const generateTextField = function(attribute, label) {
+      const elText = elWrap(
+          TextControl,
+          {
+            value: props.attributes[attribute],
+            onChange: function(value) {
+              props.setAttributes({
+                [attribute]: value,
+                className: 'gbcp-input__text',
+              });
+            },
+            label: label,
+          }
+      );
+      return elText;
+    };
+    const generateRichText = function(attribute, label) {
+      const elText = el(
+          RichText,
+          {
+            value: props.attributes[attribute],
+            onChange: function(value) {
+              props.setAttributes({
+                [attribute]: value,
+              });
+            },
+            id: 'richtext-' + attribute,
+            className: 'gbcp-input__rich-text',
+          }
+      );
+      const elLabel = el(
+          'label',
+          {
+            for: 'richtext-' + attribute,
+          },
+          label
+      );
+      return elWrap(
+          'div',
+          {},
+          [elLabel, elText]
+      );
+    };
+    // Date field
+    const updateDate = function(newDate) {
+      props.setAttributes({expr: newDate});
+    };
+    const getChosenDate = function() {
+      return props.attributes.expr == undefined ? null : props.attributes.expr;
+    };
+    const calendarArgs = {
+      currentDate: getChosenDate(),
+      onChange: updateDate,
+      id: 'date-select',
+    };
+    const calendarElement = el(
+        wp.components.DatePicker,
+        calendarArgs
+    );
+    const calendarLabel = el(
+        'label',
+        {
+          for: 'date-select',
+        },
+        'Opportunity expires:'
+    );
+    const calendarWrapped = elWrap(
+        'div',
+        {},
+        [calendarLabel, calendarElement]
+    );
     const generateTagGroup = function(allTags, slug) {
       const taxonomyName = taxons[slug].name;
       const elementArray = [];
@@ -74,7 +164,7 @@
         const checkbox = el(
             CheckboxControl,
             {
-              'className': 'appia-tag',
+              'className': 'gbcp-tag',
               'data-id': id,
               'checked': props[slug].indexOf(id) != -1,
               'label': name,
@@ -106,7 +196,7 @@
           },
           taxonomyName
       );
-      return el(
+      return elWrap(
           'div',
           {
 
@@ -117,10 +207,19 @@
     const timeTags = generateTagGroup(props.allTimes, 'taxon_time');
     const typeTags = generateTagGroup(props.allTypes, 'taxon_type');
     const locTags = generateTagGroup(props.allLocs, 'taxon_loc');
+    const desc = generateRichText('desc', 'Opportunity description');
+    const levelDesc = generateTextField('level',
+        'Short description of time commitment '
+      + '(e.g. "2-day event" or "1 semester")');
+    const locDesc = generateTextField('loc',
+        'Short description of location '
+      + '(e.g. "Room 315 in CULC" or "Savannah, GA")');
     return el(
         'div',
-        {},
-        [timeTags, typeTags, locTags]
+        {
+          className: 'gbcp-blocks',
+        },
+        [desc, typeTags, locTags, locDesc, timeTags, levelDesc, calendarWrapped]
     );
   });
   const oppArgs = {
