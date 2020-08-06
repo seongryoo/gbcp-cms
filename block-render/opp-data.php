@@ -28,6 +28,10 @@ function gbcp_register_opp_data_block() {
         'source' => 'meta',
         'meta' => 'post_opp_meta_expr',
       ),
+      'willExpire' => array(
+        'type' => 'boolean',
+        'default' => false,
+      ),
     ),
     'render_callback' => 'gbcp_opp_data_block_render',
   );

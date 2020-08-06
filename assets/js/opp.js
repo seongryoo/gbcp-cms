@@ -6,12 +6,16 @@
   const withSelect = wp.data.withSelect;
   const withDispatch = wp.data.withDispatch;
   const compose = wp.compose.compose;
+  const withState = wp.compose.withState;
   // core api helper methods
   const getAttr = wp.data.select('core/editor').getEditedPostAttribute;
   // Components
   const CheckboxControl = wp.components.CheckboxControl;
   const TextControl = wp.components.TextControl;
   const RichText = wp.blockEditor.RichText;
+  const RadioControl = wp.components.RadioControl;
+  // Calendar help
+  const date = wp.date.date;
   // Get taxonomy data
   let taxons;
   wp.apiFetch({path: '/wp/v2/taxonomies'}).then((taxonomies) => {
@@ -129,6 +133,7 @@
     };
     // Date field
     const updateDate = function(newDate) {
+      console.log(newDate)
       props.setAttributes({expr: newDate});
     };
     const getChosenDate = function() {
@@ -143,17 +148,37 @@
         wp.components.DatePicker,
         calendarArgs
     );
-    const calendarLabel = el(
-        'label',
+    let chosenDate = '';
+    if (props.attributes.willExpire) {
+      const dateString = date('l, F j, Y', props.attributes.expr);
+      chosenDate = '(' + dateString + ')';
+    }
+    // Radio element
+    const optionValues = [
+      {label: 'Never', value: 'never'},
+      {label: 'After a specific date ' + chosenDate, value: 'after'},
+    ];
+    const willItExpire = function() {
+      return props.attributes.willExpire ? 'after' : 'never';
+    };
+    const radio = el(
+        RadioControl,
         {
-          for: 'date-select',
-        },
-        'Opportunity expires:'
+          label: 'Opportunity expires',
+          selected: willItExpire(),
+          options: optionValues,
+          onChange: function(value) {
+            props.setAttributes({
+              willExpire: value == 'after',
+            });
+          },
+        }
     );
-    const calendarWrapped = elWrap(
+    const expirationControl = elWrap(
         'div',
         {},
-        [calendarLabel, calendarElement]
+        props.attributes.willExpire ?
+          [radio, calendarElement] : [radio]
     );
     const generateTagGroup = function(allTags, slug) {
       const taxonomyName = taxons[slug].name;
@@ -161,6 +186,7 @@
       for (const tag of allTags) {
         const id = tag.id;
         const name = tag.name;
+        const description = tag.description;
         const checkbox = el(
             CheckboxControl,
             {
@@ -168,6 +194,7 @@
               'data-id': id,
               'checked': props[slug].indexOf(id) != -1,
               'label': name,
+              'help': description,
               'onChange': function() {
                 const fetchSlugs = props[slug].slice(0);
                 if (fetchSlugs.indexOf(id) == -1) {
@@ -219,7 +246,15 @@
         {
           className: 'gbcp-blocks',
         },
-        [desc, typeTags, locTags, locDesc, timeTags, levelDesc, calendarWrapped]
+        [
+          desc,
+          typeTags,
+          locTags,
+          locDesc,
+          timeTags,
+          levelDesc,
+          expirationControl,
+        ]
     );
   });
   const oppArgs = {
