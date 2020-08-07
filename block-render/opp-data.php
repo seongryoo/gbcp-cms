@@ -28,9 +28,11 @@ function gbcp_register_opp_data_block() {
         'source' => 'meta',
         'meta' => 'post_opp_meta_expr',
       ),
-      'willExpire' => array(
+      'will_expire' => array(
         'type' => 'boolean',
         'default' => false,
+        'source' => 'meta',
+        'meta' => 'post_opp_meta_will_expire'
       ),
     ),
     'render_callback' => 'gbcp_opp_data_block_render',
@@ -56,8 +58,6 @@ add_filter( 'enter_title_here', 'gbcp_opp_change_title_text' );
 // Rendering
 
 function gbcp_opp_data_block_render( $attributes ) {
-
   $markup = '';
-  $markup .= 'test';
   return $markup;
 }

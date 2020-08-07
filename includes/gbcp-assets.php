@@ -1,7 +1,20 @@
 <?php
 
-// Enqueue stylesheets
-function gbcp_enqueue_admin_styles() {
+// Enqueue frontend stylesheets
+function gbcp_enqueue_assets() {
+  $stylesheets = array(
+  );
+
+  foreach( $stylesheets as $style ) {
+    $style_name = 'gbcp-' . $style;
+    $style_path = plugins_url( '/../frontend-assets/css/' . $style . '.css', __FILE__ );
+    wp_enqueue_style( $style_name, $style_path );
+  }
+}
+add_action( 'wp_enqueue_scripts', 'gbcp_enqueue_assets' );
+
+// Enqueue admin stylesheets
+function gbcp_enqueue_admin_assets() {
   $stylesheets = array(
     'admin',
   );
@@ -10,10 +23,9 @@ function gbcp_enqueue_admin_styles() {
     $style_name = 'gbcp-' . $style;
     $style_path = plugins_url( '/../admin-assets/css/' . $style . '.css', __FILE__ );
     wp_enqueue_style( $style_name, $style_path );
-    scream( $style_path );
   }
 }
-add_action( 'admin_enqueue_scripts', 'gbcp_enqueue_admin_styles' );
+add_action( 'admin_enqueue_scripts', 'gbcp_enqueue_admin_assets' );
 
 
 // Enqueue block editor scripts

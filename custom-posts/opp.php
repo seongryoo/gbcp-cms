@@ -56,7 +56,7 @@ function gbcp_register_opp_meta() {
   // 5. Expiration date
   
   $string_fields = array(
-    'post_opp_meta_title',
+    'post_opp_meta_will_expire',
     'post_opp_meta_desc',
     'post_opp_meta_level',
     'post_opp_meta_loc',

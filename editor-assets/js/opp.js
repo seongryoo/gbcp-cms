@@ -118,6 +118,7 @@
             placeholder: 'Start typing...',
             id: 'richtext-' + attribute,
             className: 'gbcp-input__rich-text',
+            multiline: true,
           }
       );
       const elHint = el(
@@ -157,7 +158,7 @@
         calendarArgs
     );
     let chosenDate = '';
-    if (props.attributes.willExpire && props.attributes.expr != '') {
+    if (props.attributes.will_expire && props.attributes.expr != '') {
       const dateString = date('l, F j, Y', props.attributes.expr);
       chosenDate = '(' + dateString + ')';
     }
@@ -167,7 +168,7 @@
       {label: 'After a specific date ' + chosenDate, value: 'after'},
     ];
     const willItExpire = function() {
-      return props.attributes.willExpire ? 'after' : 'never';
+      return props.attributes.will_expire ? 'after' : 'never';
     };
     const radio = el(
         RadioControl,
@@ -178,7 +179,7 @@
           className: 'gbcp-radio',
           onChange: function(value) {
             props.setAttributes({
-              willExpire: value == 'after',
+              will_expire: value == 'after',
             });
           },
         }
@@ -188,7 +189,7 @@
         {
           className: 'gbcp-expiration',
         },
-        props.attributes.willExpire ?
+        props.attributes.will_expire ?
           [radio, calendarElement] : [radio]
     );
     const generateTagGroup = function(allTags, slug) {
