@@ -1,0 +1,30 @@
+.column-wpseo-score {
+    display: none;
+}
+.column-wpseo-score-readability {
+    display: none;
+}
+.column-slug {
+    display: none;
+}
+[href^="edit-tags.php"][href*="post_type=post_opp"] {
+    display: flex !important;
+    opacity: 0.8;
+}
+[href^="edit-tags.php"][href*="post_type=post_opp"][href*="taxonomy=taxon_type"] {
+    margin-top: 1em !important;
+}
+[href^="edit-tags.php"][href*="post_type=post_opp"]:before {
+    font-family: 'dashicons';
+    display: block;
+    margin: 0 0.5em 0 0;
+}
+[href^="edit-tags.php"][href*="post_type=post_opp"][href*="taxonomy=taxon_type"]:before {
+    content: "\f481"; /* dashicons-clipboard */
+}
+[href^="edit-tags.php"][href*="post_type=post_opp"][href*="taxonomy=taxon_loc"]:before {
+    content: "\f527"; /* dashicons-palmtree */
+}
+[href^="edit-tags.php"][href*="post_type=post_opp"][href*="taxonomy=taxon_time"]:before {
+    content: "\f469"; /* dashicons-clock */
+}

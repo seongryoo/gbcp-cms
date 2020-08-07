@@ -99,6 +99,7 @@
                 className: 'gbcp-input__text',
               });
             },
+            placeholder: 'Start typing...',
             label: label,
           }
       );
@@ -114,9 +115,17 @@
                 [attribute]: value,
               });
             },
+            placeholder: 'Start typing...',
             id: 'richtext-' + attribute,
             className: 'gbcp-input__rich-text',
           }
+      );
+      const elHint = el(
+          'p',
+          {
+            className: 'hint',
+          },
+          'Hint: you can insert links or use bold/italic text'
       );
       const elLabel = el(
           'label',
@@ -128,16 +137,15 @@
       return elWrap(
           'div',
           {},
-          [elLabel, elText]
+          [elLabel, elHint, elText]
       );
     };
     // Date field
     const updateDate = function(newDate) {
-      console.log(newDate)
       props.setAttributes({expr: newDate});
     };
     const getChosenDate = function() {
-      return props.attributes.expr == undefined ? null : props.attributes.expr;
+      return props.attributes.expr == '' ? null : props.attributes.expr;
     };
     const calendarArgs = {
       currentDate: getChosenDate(),
@@ -149,7 +157,7 @@
         calendarArgs
     );
     let chosenDate = '';
-    if (props.attributes.willExpire) {
+    if (props.attributes.willExpire && props.attributes.expr != '') {
       const dateString = date('l, F j, Y', props.attributes.expr);
       chosenDate = '(' + dateString + ')';
     }
@@ -167,6 +175,7 @@
           label: 'Opportunity expires',
           selected: willItExpire(),
           options: optionValues,
+          className: 'gbcp-radio',
           onChange: function(value) {
             props.setAttributes({
               willExpire: value == 'after',
@@ -176,7 +185,9 @@
     );
     const expirationControl = elWrap(
         'div',
-        {},
+        {
+          className: 'gbcp-expiration',
+        },
         props.attributes.willExpire ?
           [radio, calendarElement] : [radio]
     );
@@ -190,7 +201,7 @@
         const checkbox = el(
             CheckboxControl,
             {
-              'className': 'gbcp-tag',
+              'className': 'gbcp-checkbox',
               'data-id': id,
               'checked': props[slug].indexOf(id) != -1,
               'label': name,

@@ -69,6 +69,15 @@ function gbcp_register_opp_meta() {
 }
 add_action( 'init', 'gbcp_register_opp_meta' );
 
+function gbcp_register_opp_data_block_template() {
+  $opp_object = get_post_type_object( 'post_opp' );
+  $opp_object->template = array(
+    array( 'gbcp/opp-data' ),
+  );
+  $opp_object->template_lock = 'all';
+}
+add_action( 'init', 'gbcp_register_opp_data_block_template' );
+
 function gbcp_flush_opp() {
   gbcp_register_opp();
   gbcp_register_opp_meta();

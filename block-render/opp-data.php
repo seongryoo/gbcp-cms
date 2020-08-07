@@ -40,6 +40,19 @@ function gbcp_register_opp_data_block() {
 }
 add_action( 'init', 'gbcp_register_opp_data_block' );
 
+// Replacing gutenberg title text
+
+function gbcp_opp_change_title_text( $title ) {
+  $screen = get_current_screen();
+
+  if ( 'post_opp' == $screen->post_type ) {
+    $title = 'Add Title (e.g. "Sign up for an affiliated course")';
+  }
+
+  return $title;
+}
+add_filter( 'enter_title_here', 'gbcp_opp_change_title_text' );
+
 // Rendering
 
 function gbcp_opp_data_block_render( $attributes ) {
